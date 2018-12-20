@@ -3,15 +3,14 @@ import { Link } from 'react-router-dom';
 import {
     Box,
     Flex,
+    Card,
     Image,
 } from 'rebass';
 import { default as SidebarComponentItem } from './sidebarComponentItem';
 import {
-  AddMasternodeIcon,
-  MasternodeManagementIcon,
-  WalletManagementIcon,
-} from '../Icons';
-import { theme } from '../../config';
+  app,
+  theme,
+} from '../../config';
 
 interface SidebarComponentStyles {
   sidebarComponentItemStyles: object;
@@ -40,7 +39,9 @@ const styles:SidebarComponentStyles = {
   },
 };
 
-const sidebarComponent = ({ ...props }:any) => (
+const sidebarComponent = ({
+  location,
+  ...props }:any) => (
   <Box style={styles.sidebarComponentContainer} {...props}>
     <Link to={'/'}>
       <SidebarComponentItem
@@ -53,27 +54,65 @@ const sidebarComponent = ({ ...props }:any) => (
         <Image src={require('../Sidebar/stone-icon.png')}/>
       </SidebarComponentItem>
     </Link>
+    {/*
+      * Create sidebar links for every sidebarLink object defined in the config.
+      */}
+    {
+      Object
+        .keys(app.sidebarLinks)
+        .map((
+          link,
+          i,
+        ) => {
+          const currentLink = app.sidebarLinks[link];
+          // tslint:disable-next-line:variable-name
+          const Icon = currentLink.icon;
+          const isActiveSidebarLink = link === location.pathname;
 
-    <SidebarComponentItem
-      style={styles.sidebarComponentItemStyles}
-      data-testid={'sidebar-component-item'}
-    >
-      <AddMasternodeIcon />
-    </SidebarComponentItem>
+          return (
+            <Link
+              key={i}
+              to={link}
+            >
+              <SidebarComponentItem
+                data-testid={'sidebar-component-item'}
+                style={styles.sidebarComponentItemStyles}
+              >
+                <Card
+                  borderRadius={theme.radiusSizes[1]}
+                  bg={isActiveSidebarLink && theme.colors.blue}
+                  style={{
+                    width: '45px',
+                    height: '45px',
+                  }}
+                >
+                {
+                  // TODO: create a <DeadCentered /> component that centers
+                  // child elements vertically and horizontally.
+                }
+                  <Flex
+                    alignItems={'center'}
+                    justifyContent={'center'}
+                  >
+                    <Flex
+                      flexDirection={'column'}
+                      width={1}
+                      alignItems={'center'}
+                      style={{
+                        marginTop: '50%',
+                        transform: 'translateY(-50%)',
+                      }}
+                    >
+                      <Icon baseBg={isActiveSidebarLink ? '#fff' : theme.colors.darkgray} />
+                    </Flex>
+                  </Flex>
+                </Card>
+              </SidebarComponentItem>
 
-    <SidebarComponentItem
-      style={styles.sidebarComponentItemStyles}
-      data-testid={'sidebar-component-item'}
-    >
-      <MasternodeManagementIcon />
-    </SidebarComponentItem>
+            </Link>
+          );
+        })}
 
-    <SidebarComponentItem
-      style={styles.sidebarComponentItemStyles}
-      data-testid={'sidebar-component-item'}
-    >
-      <WalletManagementIcon />
-    </SidebarComponentItem>
   </Box>
 );
 
